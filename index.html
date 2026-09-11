@@ -123,7 +123,7 @@
   </section>
 
   <section>
-    <h2>L1 Hotline 通话量 — 分地区</h2>
+    <h2>Hotline 情况</h2>
     <div class="sub">数据来源 Genesys Cloud（voice queue），ROE 暂未配置电话队列</div>
     <div id="hotlineBars"></div>
   </section>
@@ -285,9 +285,12 @@ regions.forEach(reg=>{
     return;
   }
   const regionTotal = queues.reduce((s,q)=>s+q.offer,0);
+  const regionAnswer = queues.reduce((s,q)=>s+q.answer,0);
+  const regionAbandon = queues.reduce((s,q)=>s+q.abandon,0);
   let rows = '';
   queues.forEach(q=>{
     const w = q.offer/maxOffer*100;
+    const answerPct = q.answer/q.offer*100;
     const abandonPct = q.abandon/q.offer*100;
     rows += `
       <div class="bar-row">
@@ -295,12 +298,14 @@ regions.forEach(reg=>{
         <div class="bar-track"><div class="bar-fill" style="width:${w}%">
           <div class="bar-fill na" style="width:${abandonPct}%; float:right; height:100%;"></div>
         </div></div>
-        <div class="bar-val num">${q.offer}</div>
+        <div class="bar-val num" style="width:230px;text-align:left;padding-left:10px;">
+          来电 ${q.offer}　接起率 <b>${answerPct.toFixed(0)}%</b>　放弃率 <b class="${abandonPct>=30?'delta-up':''}">${abandonPct.toFixed(0)}%</b>
+        </div>
       </div>`;
   });
   hotlineBars.insertAdjacentHTML('beforeend', `
     <div class="region-block">
-      <div class="rlabel"><span>${reg}</span><span class="rtotal num">合计来电 ${regionTotal}</span></div>
+      <div class="rlabel"><span>${reg}</span><span class="rtotal num">合计来电 ${regionTotal}　接起率 ${(regionAnswer/regionTotal*100).toFixed(1)}%　放弃率 ${(regionAbandon/regionTotal*100).toFixed(1)}%</span></div>
       ${rows}
     </div>`);
 });
