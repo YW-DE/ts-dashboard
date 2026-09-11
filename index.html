@@ -57,11 +57,23 @@
   .region-block .rlabel .rtotal{ color:var(--ink-soft); font-weight:400; }
   .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:5px; }
   .bar-row .tier{ width:26px; font-size:11px; color:var(--ink-soft); flex-shrink:0; }
-  .bar-track{ flex:1; height:16px; background:#fff; border:1px solid var(--hair); position:relative; overflow:hidden; cursor:help; }
+  .bar-track{ flex:1; height:16px; background:#fff; border:1px solid var(--hair); position:relative; cursor:help; }
   .bar-track:hover{ outline:2px solid var(--teal); outline-offset:1px; }
   .ratio-track:hover{ outline:2px solid var(--teal); outline-offset:1px; }
   .kpi{ cursor:help; }
-  .bar-fill{ height:100%; background:var(--teal); }
+  [data-tip]{ position:relative; }
+  [data-tip]:hover::after{
+    content: attr(data-tip);
+    position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%);
+    background:var(--ink); color:#fff; font-family:"Noto Sans CJK SC","Noto Sans",Arial,sans-serif;
+    font-size:12px; line-height:1.5; white-space:nowrap; padding:6px 10px; z-index:50;
+    box-shadow:0 2px 8px rgba(0,0,0,0.25);
+  }
+  [data-tip]:hover::before{
+    content:''; position:absolute; left:50%; bottom:100%; transform:translateX(-50%);
+    border:5px solid transparent; border-top-color:var(--ink); margin-bottom:-2px; z-index:50;
+  }
+  .bar-fill{ height:100%; background:var(--teal); overflow:hidden; }
   .bar-fill.na{ background:repeating-linear-gradient(135deg, var(--amber), var(--amber) 3px, var(--amber-soft) 3px, var(--amber-soft) 6px); }
   .bar-val{ width:56px; text-align:right; font-size:12px; flex-shrink:0; }
 
@@ -183,7 +195,7 @@ regions.forEach(reg=>{
   const ratio = ticketTot ? (woTot/ticketTot*100) : 0;
   const cls = naPct >= 45 ? 'risk' : (naPct >= 25 ? 'warn' : '');
   kpiRow.insertAdjacentHTML('beforeend', `
-    <div class="kpi ${cls}" title="${reg}：Ticket存量 ${ticketTot.toLocaleString()}，无动作 ${naTot.toLocaleString()}（${naPct}%），WorkOrder存量 ${woTot.toLocaleString()}（占Ticket ${ratio.toFixed(1)}%）">
+    <div class="kpi ${cls}" data-tip="${reg}：Ticket存量 ${ticketTot.toLocaleString()}，无动作 ${naTot.toLocaleString()}（${naPct}%），WorkOrder存量 ${woTot.toLocaleString()}（占Ticket ${ratio.toFixed(1)}%）">
       <div class="region">${reg}</div>
       <div class="metrics">
         <div><div class="metric-label">Ticket 存量</div><div class="metric-val num">${ticketTot.toLocaleString()}</div></div>
@@ -206,7 +218,7 @@ regions.forEach(reg=>{
     const naPct = s ? (na/s*100) : 0;
     rows += `<div class="bar-row">
       <div class="tier">${t}</div>
-      <div class="bar-track" title="${t} 存量 ${s.toLocaleString()}，其中无动作 ${na.toLocaleString()}（${naPct.toFixed(0)}%）"><div class="bar-fill" style="width:${pct}%">
+      <div class="bar-track" data-tip="${t} 存量 ${s.toLocaleString()}，其中无动作 ${na.toLocaleString()}（${naPct.toFixed(0)}%）"><div class="bar-fill" style="width:${pct}%">
         <div class="bar-fill na" style="width:${naPct}%; float:right; height:100%;"></div>
       </div></div>
       <div class="bar-val num">${s.toLocaleString()}</div>
@@ -255,7 +267,7 @@ regions.forEach(reg=>{
   ratioBars.insertAdjacentHTML('beforeend', `
     <div class="ratio-row">
       <div class="rname">${reg}</div>
-      <div class="ratio-track" title="${reg}：WorkOrder存量 ${woTot.toLocaleString()} / Ticket存量 ${ticketTot.toLocaleString()} = ${ratio.toFixed(1)}%"><div class="ratio-fill ${hot?'hot':''}" style="width:${Math.min(ratio/maxRatio*100,100)}%"></div></div>
+      <div class="ratio-track" data-tip="${reg}：WorkOrder存量 ${woTot.toLocaleString()} / Ticket存量 ${ticketTot.toLocaleString()} = ${ratio.toFixed(1)}%"><div class="ratio-fill ${hot?'hot':''}" style="width:${Math.min(ratio/maxRatio*100,100)}%"></div></div>
       <div class="ratio-pct num">${ratio.toFixed(1)}%</div>
     </div>`);
 });
@@ -298,7 +310,7 @@ regions.forEach(reg=>{
     rows += `
       <div class="bar-row">
         <div class="tier" style="width:130px;">${q.name}</div>
-        <div class="bar-track" title="${q.name}：来电 ${q.offer}，接起 ${q.answer}（${answerPct.toFixed(0)}%），放弃 ${q.abandon}（${abandonPct.toFixed(0)}%）"><div class="bar-fill" style="width:${w}%">
+        <div class="bar-track" data-tip="${q.name}：来电 ${q.offer}，接起 ${q.answer}（${answerPct.toFixed(0)}%），放弃 ${q.abandon}（${abandonPct.toFixed(0)}%）"><div class="bar-fill" style="width:${w}%">
           <div class="bar-fill na" style="width:${abandonPct}%; float:right; height:100%;"></div>
         </div></div>
         <div class="bar-val num" style="width:230px;text-align:left;padding-left:10px;">
