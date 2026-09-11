@@ -122,6 +122,12 @@
     <div id="ratioBars"></div>
   </section>
 
+  <section>
+    <h2>L1 Hotline 通话量 — 分地区</h2>
+    <div class="sub">数据来源 Genesys Cloud（voice queue），ROE 暂未配置电话队列</div>
+    <div id="hotlineBars"></div>
+  </section>
+
   <footer>
     Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus　·　地区范围仅覆盖德语区(DE/AT)、荷比卢、ROE，不含英国及非欧洲市场
   </footer>
@@ -248,6 +254,38 @@ regions.forEach(reg=>{
       <div class="rname">${reg}</div>
       <div class="ratio-track"><div class="ratio-fill ${hot?'hot':''}" style="width:${Math.min(ratio/maxRatio*100,100)}%"></div></div>
       <div class="ratio-pct num">${ratio.toFixed(1)}%</div>
+    </div>`);
+});
+// ---- Hotline bars ----
+const hotline = {
+  "德语区(DE/AT)": {offer:334, answer:176, abandon:90},
+  "荷比卢": {offer:253, answer:196, abandon:53},
+};
+const hotlineBars = document.getElementById('hotlineBars');
+const maxOffer = Math.max(...Object.values(hotline).map(d=>d.offer));
+regions.forEach(reg=>{
+  const d = hotline[reg];
+  if(!d){
+    hotlineBars.insertAdjacentHTML('beforeend', `
+      <div class="ratio-row">
+        <div class="rname">${reg}</div>
+        <div class="ratio-track" style="display:flex;align-items:center;padding-left:8px;color:var(--ink-soft);font-size:12px;">暂无队列数据</div>
+      </div>`);
+    return;
+  }
+  const answerPct = d.answer/d.offer*100;
+  const abandonPct = d.abandon/d.offer*100;
+  const w = d.offer/maxOffer*100;
+  hotlineBars.insertAdjacentHTML('beforeend', `
+    <div class="region-block">
+      <div class="rlabel"><span>${reg}</span><span class="rtotal num">来电 ${d.offer}　接起率 ${answerPct.toFixed(1)}%　放弃率 ${abandonPct.toFixed(1)}%</span></div>
+      <div class="bar-row">
+        <div class="tier">量</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${w}%">
+          <div class="bar-fill na" style="width:${abandonPct}%; float:right; height:100%;"></div>
+        </div></div>
+        <div class="bar-val num">${d.offer}</div>
+      </div>
     </div>`);
 });
 </script>
