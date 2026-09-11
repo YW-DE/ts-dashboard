@@ -256,36 +256,52 @@ regions.forEach(reg=>{
       <div class="ratio-pct num">${ratio.toFixed(1)}%</div>
     </div>`);
 });
-// ---- Hotline bars ----
-const hotline = {
-  "德语区(DE/AT)": {offer:334, answer:176, abandon:90},
-  "荷比卢": {offer:253, answer:196, abandon:53},
+// ---- Hotline bars (per queue/line) ----
+const hotlineQueues = {
+  "德语区(DE/AT)": [
+    {name:"GER_End_User", offer:246, answer:109, abandon:69},
+    {name:"GER_Installer", offer:50, answer:45, abandon:5},
+    {name:"GER-On-Site", offer:38, answer:22, abandon:16},
+  ],
+  "荷比卢": [
+    {name:"NLD_Installer", offer:91, answer:85, abandon:6},
+    {name:"NLD_Field_Service", offer:70, answer:43, abandon:27},
+    {name:"BEL_Field_Service", offer:32, answer:19, abandon:13},
+    {name:"NLD_End_User", offer:21, answer:15, abandon:2},
+    {name:"BEL_Installer", offer:29, answer:27, abandon:2},
+    {name:"BEL_End_User", offer:10, answer:7, abandon:3},
+  ],
 };
 const hotlineBars = document.getElementById('hotlineBars');
-const maxOffer = Math.max(...Object.values(hotline).map(d=>d.offer));
+const allQueues = Object.values(hotlineQueues).flat();
+const maxOffer = Math.max(...allQueues.map(q=>q.offer));
 regions.forEach(reg=>{
-  const d = hotline[reg];
-  if(!d){
+  const queues = hotlineQueues[reg];
+  if(!queues){
     hotlineBars.insertAdjacentHTML('beforeend', `
-      <div class="ratio-row">
-        <div class="rname">${reg}</div>
-        <div class="ratio-track" style="display:flex;align-items:center;padding-left:8px;color:var(--ink-soft);font-size:12px;">暂无队列数据</div>
+      <div class="region-block">
+        <div class="rlabel"><span>${reg}</span><span class="rtotal num">暂无队列数据</span></div>
       </div>`);
     return;
   }
-  const answerPct = d.answer/d.offer*100;
-  const abandonPct = d.abandon/d.offer*100;
-  const w = d.offer/maxOffer*100;
-  hotlineBars.insertAdjacentHTML('beforeend', `
-    <div class="region-block">
-      <div class="rlabel"><span>${reg}</span><span class="rtotal num">来电 ${d.offer}　接起率 ${answerPct.toFixed(1)}%　放弃率 ${abandonPct.toFixed(1)}%</span></div>
+  const regionTotal = queues.reduce((s,q)=>s+q.offer,0);
+  let rows = '';
+  queues.forEach(q=>{
+    const w = q.offer/maxOffer*100;
+    const abandonPct = q.abandon/q.offer*100;
+    rows += `
       <div class="bar-row">
-        <div class="tier">量</div>
+        <div class="tier" style="width:130px;">${q.name}</div>
         <div class="bar-track"><div class="bar-fill" style="width:${w}%">
           <div class="bar-fill na" style="width:${abandonPct}%; float:right; height:100%;"></div>
         </div></div>
-        <div class="bar-val num">${d.offer}</div>
-      </div>
+        <div class="bar-val num">${q.offer}</div>
+      </div>`;
+  });
+  hotlineBars.insertAdjacentHTML('beforeend', `
+    <div class="region-block">
+      <div class="rlabel"><span>${reg}</span><span class="rtotal num">合计来电 ${regionTotal}</span></div>
+      ${rows}
     </div>`);
 });
 </script>
