@@ -260,17 +260,17 @@ regions.forEach(reg=>{
 // ---- Hotline bars (per queue/line) ----
 const hotlineQueues = {
   "德语区(DE/AT)": [
-    {name:"GER-On-Site", offer:6, answer:6, abandon:0},
-    {name:"GER_End_User", offer:79, answer:22, abandon:33},
-    {name:"GER_Installer", offer:5, answer:5, abandon:0},
+    {name:"GER-On-Site", offer:5, answer:3, abandon:2},
+    {name:"GER_End_User", offer:128, answer:12, abandon:116},
+    {name:"GER_Installer", offer:11, answer:11, abandon:0},
   ],
   "荷比卢": [
-    {name:"BEL_End_User", offer:2, answer:2, abandon:0},
-    {name:"BEL_Field_Service", offer:7, answer:6, abandon:1},
-    {name:"BEL_Installer", offer:3, answer:3, abandon:0},
-    {name:"NLD_End_User", offer:3, answer:3, abandon:0},
-    {name:"NLD_Field_Service", offer:13, answer:8, abandon:5},
-    {name:"NLD_Installer", offer:14, answer:14, abandon:0},
+    {name:"BEL_End_User", offer:1, answer:1, abandon:0},
+    {name:"BEL_Field_Service", offer:12, answer:7, abandon:5},
+    {name:"BEL_Installer", offer:0, answer:0, abandon:0},
+    {name:"NLD_End_User", offer:10, answer:8, abandon:0},
+    {name:"NLD_Field_Service", offer:15, answer:7, abandon:8},
+    {name:"NLD_Installer", offer:17, answer:16, abandon:1},
   ],
 };
 const hotlineBars = document.getElementById('hotlineBars');
