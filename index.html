@@ -150,7 +150,7 @@
 </div>
 
 <script>
-const PULLED = new Date(1789574417659);
+const PULLED = new Date(1789721424726);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -158,14 +158,14 @@ const regions = ['德语区(DE/AT)','荷比卢','ROE'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['发货','内部上门','服务商上门'];
 
-const stock = {"德语区(DE/AT)|L1":2520,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":81,"德语区(DE/AT)|L4":28,"荷比卢|L1":922,"荷比卢|L2":135,"荷比卢|L3":127,"荷比卢|L4":16,"ROE|L1":358,"ROE|L2":15,"ROE|L3":51,"ROE|L4":6};
-const noAction = {"德语区(DE/AT)|L1":424,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":1,"荷比卢|L1":59,"荷比卢|L2":52,"荷比卢|L3":39,"荷比卢|L4":0,"ROE|L1":110,"ROE|L2":2,"ROE|L3":40,"ROE|L4":0};
-const newThis = {"德语区(DE/AT)|L1":158,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":1,"德语区(DE/AT)|L4":11,"荷比卢|L1":115,"荷比卢|L2":0,"荷比卢|L3":4,"荷比卢|L4":6,"ROE|L1":25,"ROE|L2":0,"ROE|L3":2,"ROE|L4":5};
-const newLast = {"德语区(DE/AT)|L1":393,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":4,"荷比卢|L1":195,"荷比卢|L2":4,"荷比卢|L3":18,"荷比卢|L4":4,"ROE|L1":41,"ROE|L2":5,"ROE|L3":1,"ROE|L4":0};
-const closedThis = {"德语区(DE/AT)|L1":195,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":11,"德语区(DE/AT)|L4":1,"荷比卢|L1":214,"荷比卢|L2":13,"荷比卢|L3":10,"荷比卢|L4":0,"ROE|L1":28,"ROE|L2":0,"ROE|L3":27,"ROE|L4":0};
+const stock = {"德语区(DE/AT)|L1":2550,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":92,"德语区(DE/AT)|L4":9,"荷比卢|L1":848,"荷比卢|L2":129,"荷比卢|L3":138,"荷比卢|L4":9,"ROE|L1":333,"ROE|L2":11,"ROE|L3":56,"ROE|L4":2};
+const noAction = {"德语区(DE/AT)|L1":421,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":24,"德语区(DE/AT)|L4":1,"荷比卢|L1":72,"荷比卢|L2":58,"荷比卢|L3":39,"荷比卢|L4":0,"ROE|L1":111,"ROE|L2":2,"ROE|L3":39,"ROE|L4":0};
+const newThis = {"德语区(DE/AT)|L1":244,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":4,"德语区(DE/AT)|L4":3,"荷比卢|L1":152,"荷比卢|L2":1,"荷比卢|L3":12,"荷比卢|L4":4,"ROE|L1":39,"ROE|L2":0,"ROE|L3":7,"ROE|L4":0};
+const newLast = {"德语区(DE/AT)|L1":397,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":0,"荷比卢|L1":199,"荷比卢|L2":4,"荷比卢|L3":18,"荷比卢|L4":0,"ROE|L1":41,"ROE|L2":5,"ROE|L3":1,"ROE|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":254,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":1,"荷比卢|L1":327,"荷比卢|L2":20,"荷比卢|L3":10,"荷比卢|L4":0,"ROE|L1":70,"ROE|L2":0,"ROE|L3":32,"ROE|L4":0};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0,"荷比卢|L1":194,"荷比卢|L2":7,"荷比卢|L3":3,"荷比卢|L4":1,"ROE|L1":39,"ROE|L2":2,"ROE|L3":2,"ROE|L4":0};
 
-const woStock = {"德语区(DE/AT)|发货":299,"德语区(DE/AT)|内部上门":67,"德语区(DE/AT)|服务商上门":82,"荷比卢|发货":90,"荷比卢|内部上门":67,"荷比卢|服务商上门":49,"ROE|发货":109,"ROE|内部上门":125,"ROE|服务商上门":1};
+const woStock = {"德语区(DE/AT)|发货":287,"德语区(DE/AT)|内部上门":65,"德语区(DE/AT)|服务商上门":82,"荷比卢|发货":90,"荷比卢|内部上门":67,"荷比卢|服务商上门":49,"ROE|发货":111,"ROE|内部上门":128,"ROE|服务商上门":1};
 
 function regionTotal(map, region, keys){
   return keys.reduce((s,k)=> s + (map[region+'|'+k]||0), 0);
