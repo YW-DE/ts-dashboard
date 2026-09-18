@@ -150,7 +150,7 @@
 </div>
 
 <script>
-const PULLED = new Date(1789721424726);
+const PULLED = new Date(1789749034649);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -158,14 +158,14 @@ const regions = ['德语区(DE/AT)','荷比卢','ROE'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['发货','内部上门','服务商上门'];
 
-const stock = {"德语区(DE/AT)|L1":2550,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":92,"德语区(DE/AT)|L4":9,"荷比卢|L1":848,"荷比卢|L2":129,"荷比卢|L3":138,"荷比卢|L4":9,"ROE|L1":333,"ROE|L2":11,"ROE|L3":56,"ROE|L4":2};
-const noAction = {"德语区(DE/AT)|L1":421,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":24,"德语区(DE/AT)|L4":1,"荷比卢|L1":72,"荷比卢|L2":58,"荷比卢|L3":39,"荷比卢|L4":0,"ROE|L1":111,"ROE|L2":2,"ROE|L3":39,"ROE|L4":0};
-const newThis = {"德语区(DE/AT)|L1":244,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":4,"德语区(DE/AT)|L4":3,"荷比卢|L1":152,"荷比卢|L2":1,"荷比卢|L3":12,"荷比卢|L4":4,"ROE|L1":39,"ROE|L2":0,"ROE|L3":7,"ROE|L4":0};
-const newLast = {"德语区(DE/AT)|L1":397,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":0,"荷比卢|L1":199,"荷比卢|L2":4,"荷比卢|L3":18,"荷比卢|L4":0,"ROE|L1":41,"ROE|L2":5,"ROE|L3":1,"ROE|L4":0};
-const closedThis = {"德语区(DE/AT)|L1":254,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":1,"荷比卢|L1":327,"荷比卢|L2":20,"荷比卢|L3":10,"荷比卢|L4":0,"ROE|L1":70,"ROE|L2":0,"ROE|L3":32,"ROE|L4":0};
+const stock = {"德语区(DE/AT)|L1":2537,"德语区(DE/AT)|L2":67,"德语区(DE/AT)|L3":92,"德语区(DE/AT)|L4":28,"荷比卢|L1":846,"荷比卢|L2":129,"荷比卢|L3":145,"荷比卢|L4":15,"ROE|L1":306,"ROE|L2":11,"ROE|L3":57,"ROE|L4":3};
+const noAction = {"德语区(DE/AT)|L1":419,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":23,"德语区(DE/AT)|L4":1,"荷比卢|L1":73,"荷比卢|L2":58,"荷比卢|L3":39,"荷比卢|L4":0,"ROE|L1":91,"ROE|L2":2,"ROE|L3":39,"ROE|L4":0};
+const newThis = {"德语区(DE/AT)|L1":282,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":4,"德语区(DE/AT)|L4":12,"荷比卢|L1":174,"荷比卢|L2":1,"荷比卢|L3":20,"荷比卢|L4":8,"ROE|L1":35,"ROE|L2":0,"ROE|L3":7,"ROE|L4":1};
+const newLast = {"德语区(DE/AT)|L1":397,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":0,"荷比卢|L1":197,"荷比卢|L2":4,"荷比卢|L3":19,"荷比卢|L4":1,"ROE|L1":39,"ROE|L2":5,"ROE|L3":2,"ROE|L4":0};
+const closedThis = {"德语区(DE/AT)|L1":294,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":15,"德语区(DE/AT)|L4":1,"荷比卢|L1":345,"荷比卢|L2":20,"荷比卢|L3":10,"荷比卢|L4":0,"ROE|L1":78,"ROE|L2":0,"ROE|L3":33,"ROE|L4":0};
 const closedLast = {"德语区(DE/AT)|L1":392,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":7,"德语区(DE/AT)|L4":0,"荷比卢|L1":194,"荷比卢|L2":7,"荷比卢|L3":3,"荷比卢|L4":1,"ROE|L1":39,"ROE|L2":2,"ROE|L3":2,"ROE|L4":0};
 
-const woStock = {"德语区(DE/AT)|发货":287,"德语区(DE/AT)|内部上门":65,"德语区(DE/AT)|服务商上门":82,"荷比卢|发货":90,"荷比卢|内部上门":67,"荷比卢|服务商上门":49,"ROE|发货":111,"ROE|内部上门":128,"ROE|服务商上门":1};
+const woStock = {"德语区(DE/AT)|发货":283,"德语区(DE/AT)|内部上门":55,"德语区(DE/AT)|服务商上门":81,"荷比卢|发货":90,"荷比卢|内部上门":68,"荷比卢|服务商上门":49,"ROE|发货":112,"ROE|内部上门":16,"ROE|服务商上门":1};
 
 function regionTotal(map, region, keys){
   return keys.reduce((s,k)=> s + (map[region+'|'+k]||0), 0);
@@ -260,17 +260,17 @@ regions.forEach(reg=>{
 // ---- Hotline bars (per queue/line) ----
 const hotlineQueues = {
   "德语区(DE/AT)": [
-    {name:"GER-On-Site", offer:6, answer:6, abandon:0},
-    {name:"GER_End_User", offer:79, answer:22, abandon:33},
-    {name:"GER_Installer", offer:5, answer:5, abandon:0},
+    {name:"GER-On-Site", offer:5, answer:3, abandon:2},
+    {name:"GER_End_User", offer:128, answer:12, abandon:116},
+    {name:"GER_Installer", offer:11, answer:11, abandon:0},
   ],
   "荷比卢": [
-    {name:"BEL_End_User", offer:2, answer:2, abandon:0},
-    {name:"BEL_Field_Service", offer:7, answer:6, abandon:1},
-    {name:"BEL_Installer", offer:3, answer:3, abandon:0},
-    {name:"NLD_End_User", offer:3, answer:3, abandon:0},
-    {name:"NLD_Field_Service", offer:13, answer:8, abandon:5},
-    {name:"NLD_Installer", offer:14, answer:14, abandon:0},
+    {name:"BEL_End_User", offer:1, answer:1, abandon:0},
+    {name:"BEL_Field_Service", offer:12, answer:7, abandon:5},
+    {name:"BEL_Installer", offer:0, answer:0, abandon:0},
+    {name:"NLD_End_User", offer:10, answer:8, abandon:0},
+    {name:"NLD_Field_Service", offer:15, answer:7, abandon:8},
+    {name:"NLD_Installer", offer:17, answer:16, abandon:1},
   ],
 };
 const hotlineBars = document.getElementById('hotlineBars');
