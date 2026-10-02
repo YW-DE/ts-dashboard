@@ -104,7 +104,7 @@
   <header>
     <div>
       <h1>技术服务部周报数据看板</h1>
-      <div class="period">周期 2026-09-21 ~ 09-27　·　数据来源 D365 CRM</div>
+      <div class="period">周期 2026-09-28 ~ 10-04　·　数据来源 D365 CRM</div>
     </div>
     <div class="pulled">拉取时间<span class="num" id="pulledTime"></span></div>
   </header>
@@ -150,7 +150,7 @@
 </div>
 
 <script>
-const PULLED = new Date(1790360574300);
+const PULLED = new Date(1790931037843);
 document.getElementById('pulledTime').textContent =
   PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 
@@ -158,14 +158,14 @@ const regions = ['德语区(DE/AT)','荷比卢','ROE'];
 const tiers = ['L1','L2','L3','L4'];
 const types = ['发货','内部上门','服务商上门'];
 
-const stock = {"德语区(DE/AT)|L1":2457,"德语区(DE/AT)|L2":82,"德语区(DE/AT)|L3":88,"德语区(DE/AT)|L4":59,"荷比卢|L1":899,"荷比卢|L2":133,"荷比卢|L3":151,"荷比卢|L4":15,"ROE|L1":321,"ROE|L2":14,"ROE|L3":49,"ROE|L4":5};
-const noAction = {"德语区(DE/AT)|L1":453,"德语区(DE/AT)|L2":6,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":0,"荷比卢|L1":73,"荷比卢|L2":59,"荷比卢|L3":42,"荷比卢|L4":0,"ROE|L1":95,"ROE|L2":1,"ROE|L3":38,"ROE|L4":0};
-const newThis = {"德语区(DE/AT)|L1":315,"德语区(DE/AT)|L2":5,"德语区(DE/AT)|L3":5,"德语区(DE/AT)|L4":23,"荷比卢|L1":237,"荷比卢|L2":0,"荷比卢|L3":11,"荷比卢|L4":8,"ROE|L1":37,"ROE|L2":2,"ROE|L3":2,"ROE|L4":4};
-const newLast = {"德语区(DE/AT)|L1":351,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":11,"德语区(DE/AT)|L4":8,"荷比卢|L1":218,"荷比卢|L2":6,"荷比卢|L3":30,"荷比卢|L4":1,"ROE|L1":49,"ROE|L2":5,"ROE|L3":3,"ROE|L4":0};
-const closedThis = {"德语区(DE/AT)|L1":371,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":2,"荷比卢|L1":204,"荷比卢|L2":2,"荷比卢|L3":4,"荷比卢|L4":1,"ROE|L1":31,"ROE|L2":3,"ROE|L3":3,"ROE|L4":1};
-const closedLast = {"德语区(DE/AT)|L1":303,"德语区(DE/AT)|L2":0,"德语区(DE/AT)|L3":15,"德语区(DE/AT)|L4":1,"荷比卢|L1":338,"荷比卢|L2":20,"荷比卢|L3":10,"荷比卢|L4":0,"ROE|L1":78,"ROE|L2":0,"ROE|L3":33,"ROE|L4":0};
+const stock = {"德语区(DE/AT)|L1":2477,"德语区(DE/AT)|L2":91,"德语区(DE/AT)|L3":90,"德语区(DE/AT)|L4":68,"荷比卢|L1":1015,"荷比卢|L2":125,"荷比卢|L3":149,"荷比卢|L4":14,"ROE|L1":316,"ROE|L2":15,"ROE|L3":45,"ROE|L4":4};
+const noAction = {"德语区(DE/AT)|L1":416,"德语区(DE/AT)|L2":9,"德语区(DE/AT)|L3":29,"德语区(DE/AT)|L4":2,"荷比卢|L1":76,"荷比卢|L2":63,"荷比卢|L3":44,"荷比卢|L4":0,"ROE|L1":98,"ROE|L2":1,"ROE|L3":38,"ROE|L4":0};
+const newThis = {"德语区(DE/AT)|L1":299,"德语区(DE/AT)|L2":4,"德语区(DE/AT)|L3":9,"德语区(DE/AT)|L4":26,"荷比卢|L1":307,"荷比卢|L2":0,"荷比卢|L3":9,"荷比卢|L4":8,"ROE|L1":42,"ROE|L2":0,"ROE|L3":0,"ROE|L4":3};
+const newLast = {"德语区(DE/AT)|L1":378,"德语区(DE/AT)|L2":10,"德语区(DE/AT)|L3":14,"德语区(DE/AT)|L4":13,"荷比卢|L1":290,"荷比卢|L2":1,"荷比卢|L3":16,"荷比卢|L4":3,"ROE|L1":44,"ROE|L2":5,"ROE|L3":0,"ROE|L4":1};
+const closedThis = {"德语区(DE/AT)|L1":316,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":4,"德语区(DE/AT)|L4":2,"荷比卢|L1":241,"荷比卢|L2":8,"荷比卢|L3":16,"荷比卢|L4":0,"ROE|L1":50,"ROE|L2":3,"ROE|L3":3,"ROE|L4":0};
+const closedLast = {"德语区(DE/AT)|L1":371,"德语区(DE/AT)|L2":1,"德语区(DE/AT)|L3":13,"德语区(DE/AT)|L4":2,"荷比卢|L1":204,"荷比卢|L2":2,"荷比卢|L3":4,"荷比卢|L4":1,"ROE|L1":31,"ROE|L2":3,"ROE|L3":3,"ROE|L4":1};
 
-const woStock = {"德语区(DE/AT)|发货":285,"德语区(DE/AT)|内部上门":61,"德语区(DE/AT)|服务商上门":92,"荷比卢|发货":88,"荷比卢|内部上门":70,"荷比卢|服务商上门":52,"ROE|发货":117,"ROE|内部上门":17,"ROE|服务商上门":1};
+const woStock = {"德语区(DE/AT)|发货":294,"德语区(DE/AT)|内部上门":60,"德语区(DE/AT)|服务商上门":96,"荷比卢|发货":87,"荷比卢|内部上门":69,"荷比卢|服务商上门":49,"ROE|发货":120,"ROE|内部上门":16,"ROE|服务商上门":1};
 
 function regionTotal(map, region, keys){
   return keys.reduce((s,k)=> s + (map[region+'|'+k]||0), 0);
