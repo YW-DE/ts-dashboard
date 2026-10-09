@@ -139,7 +139,7 @@
 
   <section>
     <h2>Hotline 情况</h2>
-    <div class="sub">本周（2026-09-28~10-04）　·　数据来源 Genesys Cloud（voice queue），ROE 暂未配置电话队列</div>
+    <div class="sub">本周（2026-10-05~10-11）　·　数据来源 Genesys Cloud（voice queue），ROE 暂未配置电话队列</div>
     <div id="hotlineBars"></div>
   </section>
 
@@ -260,17 +260,17 @@ regions.forEach(reg=>{
 // ---- Hotline bars (per queue/line) ----
 const hotlineQueues = {
   "德语区(DE/AT)": [
-    {name:"GER-On-Site", offer:38, answer:26, abandon:12},
-    {name:"GER_End_User", offer:494, answer:62, abandon:432},
-    {name:"GER_Installer", offer:49, answer:43, abandon:6},
+    {name:"GER-On-Site", offer:41, answer:29, abandon:12},
+    {name:"GER_End_User", offer:490, answer:63, abandon:427},
+    {name:"GER_Installer", offer:39, answer:38, abandon:1},
   ],
   "荷比卢": [
-    {name:"BEL_End_User", offer:5, answer:2, abandon:1},
-    {name:"BEL_Field_Service", offer:24, answer:12, abandon:12},
-    {name:"BEL_Installer", offer:20, answer:19, abandon:1},
-    {name:"NLD_End_User", offer:44, answer:29, abandon:4},
-    {name:"NLD_Field_Service", offer:103, answer:46, abandon:57},
-    {name:"NLD_Installer", offer:97, answer:82, abandon:15},
+    {name:"BEL_End_User", offer:2, answer:1, abandon:0},
+    {name:"BEL_Field_Service", offer:16, answer:9, abandon:7},
+    {name:"BEL_Installer", offer:15, answer:14, abandon:1},
+    {name:"NLD_End_User", offer:36, answer:25, abandon:6},
+    {name:"NLD_Field_Service", offer:72, answer:45, abandon:27},
+    {name:"NLD_Installer", offer:90, answer:80, abandon:10},
   ],
 };
 const hotlineBars = document.getElementById('hotlineBars');
