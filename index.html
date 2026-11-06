@@ -1,315 +1,149 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<title>技术服务部周报看板</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>技术服务部周报</title>
 <style>
-  :root{
-    --paper:#ECEEEC;
-    --panel:#F5F6F4;
-    --ink:#14181C;
-    --ink-soft:#4B5560;
-    --hair:#CBD1CE;
-    --teal:#1B6E68;
-    --teal-soft:#DCE9E7;
-    --amber:#C4842A;
-    --amber-soft:#F3E4CC;
-    --rust:#AE4A3C;
-    --rust-soft:#F2DDD9;
-    --moss:#4B7A54;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; background:var(--paper); color:var(--ink);
-    font-family:'IBM Plex Sans', sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .num{ font-family:'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
-  .wrap{ max-width:1180px; margin:0 auto; padding:40px 32px 64px; }
-
-  header{ display:flex; justify-content:space-between; align-items:flex-end;
-    border-bottom:2px solid var(--ink); padding-bottom:18px; margin-bottom:28px; }
-  header h1{ font-family:'IBM Plex Sans Condensed'; font-weight:700; font-size:30px;
-    letter-spacing:0.2px; margin:0; }
-  header .period{ font-size:14px; color:var(--ink-soft); margin-top:6px; }
-  header .pulled{ text-align:right; font-size:12px; color:var(--ink-soft); }
-  header .pulled .num{ font-size:13px; color:var(--ink); display:block; margin-top:2px; }
-
-  .kpi-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:36px; }
-  .kpi{ background:var(--panel); border:1px solid var(--hair); border-left:5px solid var(--teal); padding:16px 18px; }
-  .kpi.warn{ border-left-color:var(--amber); }
-  .kpi.risk{ border-left-color:var(--rust); }
-  .kpi .region{ font-weight:600; font-size:15px; }
-  .kpi .metrics{ display:flex; gap:22px; margin-top:12px; }
-  .kpi .metric-label{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.4px; }
-  .kpi .metric-val{ font-size:22px; font-weight:600; margin-top:2px; }
-  .kpi .metric-val.small{ font-size:15px; font-weight:500; color:var(--ink-soft); }
-
-  section{ margin-bottom:40px; }
-  section h2{ font-family:'IBM Plex Sans Condensed'; font-weight:700; font-size:17px;
-    margin:0 0 4px; }
-  section .sub{ font-size:12.5px; color:var(--ink-soft); margin-bottom:16px; }
-
-  .region-block{ margin-bottom:18px; }
-  .region-block .rlabel{ font-size:13px; font-weight:600; margin-bottom:6px; display:flex; justify-content:space-between; }
-  .region-block .rlabel .rtotal{ color:var(--ink-soft); font-weight:400; }
-  .bar-row{ display:flex; align-items:center; gap:10px; margin-bottom:5px; }
-  .bar-row .tier{ width:26px; font-size:11px; color:var(--ink-soft); flex-shrink:0; }
-  .bar-track{ flex:1; height:16px; background:#fff; border:1px solid var(--hair); position:relative; cursor:help; }
-  .bar-track:hover{ outline:2px solid var(--teal); outline-offset:1px; }
-  .ratio-track:hover{ outline:2px solid var(--teal); outline-offset:1px; }
-  .kpi{ cursor:help; }
-  [data-tip]{ position:relative; }
-  [data-tip]:hover::after{
-    content: attr(data-tip);
-    position:absolute; left:50%; bottom:calc(100% + 8px); transform:translateX(-50%);
-    background:var(--ink); color:#fff; font-family:"Noto Sans CJK SC","Noto Sans",Arial,sans-serif;
-    font-size:12px; line-height:1.5; white-space:nowrap; padding:6px 10px; z-index:50;
-    box-shadow:0 2px 8px rgba(0,0,0,0.25);
-  }
-  [data-tip]:hover::before{
-    content:''; position:absolute; left:50%; bottom:100%; transform:translateX(-50%);
-    border:5px solid transparent; border-top-color:var(--ink); margin-bottom:-2px; z-index:50;
-  }
-  .bar-fill{ height:100%; background:var(--teal); overflow:hidden; }
-  .bar-fill.na{ background:repeating-linear-gradient(135deg, var(--amber), var(--amber) 3px, var(--amber-soft) 3px, var(--amber-soft) 6px); }
-  .bar-val{ width:56px; text-align:right; font-size:12px; flex-shrink:0; }
-
-  .two-col{ display:grid; grid-template-columns:1.15fr 1fr; gap:32px; align-items:start; }
-
-  table.flat{ width:100%; border-collapse:collapse; font-size:12.5px; }
-  table.flat th{ text-align:left; font-weight:600; font-size:11px; color:var(--ink-soft);
-    text-transform:uppercase; letter-spacing:0.3px; border-bottom:1px solid var(--ink); padding:0 8px 6px 0; }
-  table.flat td{ padding:6px 8px 6px 0; border-bottom:1px solid var(--hair); }
-  table.flat td.num{ text-align:right; }
-  table.flat tr.total td{ font-weight:600; border-top:1px solid var(--ink); border-bottom:none; }
-  .delta-up{ color:var(--rust); }
-  .delta-down{ color:var(--moss); }
-
-  .ratio-row{ display:flex; align-items:center; gap:14px; margin-bottom:10px; }
-  .ratio-row .rname{ width:120px; font-size:13px; font-weight:600; flex-shrink:0; }
-  .ratio-track{ flex:1; height:22px; background:#fff; border:1px solid var(--hair); position:relative; }
-  .ratio-fill{ height:100%; background:var(--teal); }
-  .ratio-fill.hot{ background:var(--rust); }
-  .ratio-pct{ width:52px; text-align:right; font-size:13px; font-weight:600; flex-shrink:0; }
-
-  footer{ border-top:1px solid var(--hair); padding-top:14px; font-size:11.5px; color:var(--ink-soft); }
-</style>
-</head>
-<body>
-<div class="wrap">
-
-  <header>
-    <div>
-      <h1>技术服务部周报数据看板</h1>
-      <div class="period">周期 2026-11-02 ~ 11-08　·　数据来源 D365 CRM</div>
-    </div>
-    <div class="pulled">拉取时间<span class="num" id="pulledTime"></span></div>
-  </header>
-
-  <div class="kpi-row" id="kpiRow"></div>
-
-  <section>
-    <h2>Ticket 存量 — 分地区 × 层级</h2>
-    <div class="sub">条形长度为该层级存量占地区总存量的比例；斜纹填充部分为「无动作」（5个工作日无更新）</div>
-    <div id="ticketBars"></div>
-  </section>
-
-  <div class="two-col">
-    <section>
-      <h2>本周新增 / 关闭</h2>
-      <div class="sub">环比为与上周同期比较，红色=环比恶化，绿色=环比改善</div>
-      <table class="flat" id="deltaTable"></table>
-    </section>
-
-    <section>
-      <h2>Work Order — 分地区 × 类型</h2>
-      <div class="sub">存量，剔除已发货(Shipped)状态记录</div>
-      <table class="flat" id="woTable"></table>
-    </section>
-  </div>
-
-  <section>
-    <h2>Work Order / Ticket 存量比值</h2>
-    <div class="sub">该地区有多少比例的 Ticket 存量已转化为实体工单</div>
-    <div id="ratioBars"></div>
-  </section>
-
-  <section>
-    <h2>Hotline 情况</h2>
-    <div class="sub">本周（2026-10-26~11-01）　·　数据来源 Genesys Cloud（voice queue），ROE 暂未配置电话队列</div>
-    <div id="hotlineBars"></div>
-  </section>
-
-  <footer>
-    Ticket 判断字段 alp_casegrade / alp_casestatus　·　Work Order 判断字段 alp_chooseprocessingmethod / alp_onsitemethod / msdyn_systemstatus　·　地区范围仅覆盖德语区(DE/AT)、荷比卢、ROE，不含英国及非欧洲市场
-  </footer>
-
-</div>
-
-<script>
-const PULLED = new Date(1793958643719);
-document.getElementById('pulledTime').textContent =
-  PULLED.toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
-
-const regions = ['德语区(DE/AT)','荷比卢','ROE'];
-const tiers = ['L1','L2','L3','L4'];
-const types = ['发货','内部上门','服务商上门'];
-
-const stock = {"德语区(DE/AT)|L1":2180,"德语区(DE/AT)|L2":89,"德语区(DE/AT)|L3":63,"德语区(DE/AT)|L4":33,"荷比卢|L1":976,"荷比卢|L2":50,"荷比卢|L3":153,"荷比卢|L4":19,"ROE|L1":104,"ROE|L2":13,"ROE|L3":40,"ROE|L4":3};
-const noAction = {"德语区(DE/AT)|L1":454,"德语区(DE/AT)|L2":12,"德语区(DE/AT)|L3":6,"德语区(DE/AT)|L4":1,"荷比卢|L1":193,"荷比卢|L2":7,"荷比卢|L3":51,"荷比卢|L4":1,"ROE|L1":14,"ROE|L2":0,"ROE|L3":4,"ROE|L4":0};
-const newThis = {"德语区(DE/AT)|L1":267,"德语区(DE/AT)|L2":3,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":12,"荷比卢|L1":181,"荷比卢|L2":0,"荷比卢|L3":7,"荷比卢|L4":8,"ROE|L1":26,"ROE|L2":0,"ROE|L3":7,"ROE|L4":3};
-const newLast = {"德语区(DE/AT)|L1":429,"德语区(DE/AT)|L2":9,"德语区(DE/AT)|L3":25,"德语区(DE/AT)|L4":8,"荷比卢|L1":244,"荷比卢|L2":2,"荷比卢|L3":21,"荷比卢|L4":3,"ROE|L1":45,"ROE|L2":0,"ROE|L3":10,"ROE|L4":0};
-const closedThis = {"德语区(DE/AT)|L1":375,"德语区(DE/AT)|L2":7,"德语区(DE/AT)|L3":29,"德语区(DE/AT)|L4":2,"荷比卢|L1":358,"荷比卢|L2":26,"荷比卢|L3":25,"荷比卢|L4":1,"ROE|L1":165,"ROE|L2":5,"ROE|L3":9,"ROE|L4":0};
-const closedLast = {"德语区(DE/AT)|L1":457,"德语区(DE/AT)|L2":28,"德语区(DE/AT)|L3":10,"德语区(DE/AT)|L4":7,"荷比卢|L1":411,"荷比卢|L2":13,"荷比卢|L3":15,"荷比卢|L4":2,"ROE|L1":54,"ROE|L2":0,"ROE|L3":3,"ROE|L4":1};
-
-const woStock = {"德语区(DE/AT)|发货":345,"德语区(DE/AT)|内部上门":51,"德语区(DE/AT)|服务商上门":85,"荷比卢|发货":86,"荷比卢|内部上门":93,"荷比卢|服务商上门":46,"ROE|发货":61,"ROE|内部上门":17,"ROE|服务商上门":0};
-
-function regionTotal(map, region, keys){
-  return keys.reduce((s,k)=> s + (map[region+'|'+k]||0), 0);
-}
-
-// ---- KPI row ----
-const kpiRow = document.getElementById('kpiRow');
-regions.forEach(reg=>{
-  const ticketTot = regionTotal(stock, reg, tiers);
-  const woTot = regionTotal(woStock, reg, types);
-  const naTot = regionTotal(noAction, reg, tiers);
-  const naPct = ticketTot ? Math.round(naTot/ticketTot*100) : 0;
-  const ratio = ticketTot ? (woTot/ticketTot*100) : 0;
-  const cls = naPct >= 45 ? 'risk' : (naPct >= 25 ? 'warn' : '');
-  kpiRow.insertAdjacentHTML('beforeend', `
-    <div class="kpi ${cls}" data-tip="${reg}：Ticket存量 ${ticketTot.toLocaleString()}，无动作 ${naTot.toLocaleString()}（${naPct}%），WorkOrder存量 ${woTot.toLocaleString()}（占Ticket ${ratio.toFixed(1)}%）">
-      <div class="region">${reg}</div>
-      <div class="metrics">
-        <div><div class="metric-label">Ticket 存量</div><div class="metric-val num">${ticketTot.toLocaleString()}</div></div>
-        <div><div class="metric-label">无动作占比</div><div class="metric-val num">${naPct}%</div></div>
-        <div><div class="metric-label">WO/Ticket</div><div class="metric-val small num">${ratio.toFixed(1)}%</div></div>
-      </div>
-    </div>`);
-});
-
-// ---- Ticket bars ----
-const ticketBars = document.getElementById('ticketBars');
-regions.forEach(reg=>{
-  const tot = regionTotal(stock, reg, tiers);
-  let rows = '';
-  tiers.forEach(t=>{
-    const k = reg+'|'+t;
-    const s = stock[k]||0;
-    const na = noAction[k]||0;
-    const pct = tot ? (s/tot*100) : 0;
-    const naPct = s ? (na/s*100) : 0;
-    rows += `<div class="bar-row">
-      <div class="tier">${t}</div>
-      <div class="bar-track" data-tip="${t} 存量 ${s.toLocaleString()}，其中无动作 ${na.toLocaleString()}（${naPct.toFixed(0)}%）"><div class="bar-fill" style="width:${pct}%">
-        <div class="bar-fill na" style="width:${naPct}%; float:right; height:100%;"></div>
-      </div></div>
-      <div class="bar-val num">${s.toLocaleString()}</div>
-    </div>`;
-  });
-  ticketBars.insertAdjacentHTML('beforeend', `
-    <div class="region-block">
-      <div class="rlabel"><span>${reg}</span><span class="rtotal num">合计 ${tot.toLocaleString()}</span></div>
-      ${rows}
-    </div>`);
-});
-
-// ---- Delta table (new/closed) ----
-const deltaTable = document.getElementById('deltaTable');
-let dRows = `<tr><th>地区</th><th class="num" style="text-align:right">新增</th><th class="num" style="text-align:right">环比</th><th class="num" style="text-align:right">关闭</th><th class="num" style="text-align:right">环比</th></tr>`;
-regions.forEach(reg=>{
-  const nt = regionTotal(newThis, reg, tiers), nl = regionTotal(newLast, reg, tiers);
-  const ct = regionTotal(closedThis, reg, tiers), cl = regionTotal(closedLast, reg, tiers);
-  const nd = nt-nl, cd = ct-cl;
-  const ndCls = nd>0?'delta-up':(nd<0?'delta-down':'');
-  const cdCls = cd>0?'delta-down':(cd<0?'delta-up':''); // closing more = good = green
-  dRows += `<tr><td>${reg}</td><td class="num" style="text-align:right">${nt}</td>
-    <td class="num ${ndCls}" style="text-align:right">${nd>0?'+':''}${nd}</td>
-    <td class="num" style="text-align:right">${ct}</td>
-    <td class="num ${cdCls}" style="text-align:right">${cd>0?'+':''}${cd}</td></tr>`;
-});
-deltaTable.innerHTML = dRows;
-
-// ---- WO table ----
-const woTable = document.getElementById('woTable');
-let wRows = `<tr><th>地区</th><th class="num" style="text-align:right">发货</th><th class="num" style="text-align:right">内部上门</th><th class="num" style="text-align:right">服务商上门</th><th class="num" style="text-align:right">合计</th></tr>`;
-regions.forEach(reg=>{
-  const a = woStock[reg+'|发货']||0, b = woStock[reg+'|内部上门']||0, c = woStock[reg+'|服务商上门']||0;
-  wRows += `<tr><td>${reg}</td><td class="num" style="text-align:right">${a}</td><td class="num" style="text-align:right">${b}</td><td class="num" style="text-align:right">${c}</td><td class="num" style="text-align:right;font-weight:600">${a+b+c}</td></tr>`;
-});
-woTable.innerHTML = wRows;
-
-// ---- Ratio bars ----
-const ratioBars = document.getElementById('ratioBars');
-const maxRatio = 30;
-regions.forEach(reg=>{
-  const ticketTot = regionTotal(stock, reg, tiers);
-  const woTot = regionTotal(woStock, reg, types);
-  const ratio = ticketTot ? (woTot/ticketTot*100) : 0;
-  const hot = ratio > 20;
-  ratioBars.insertAdjacentHTML('beforeend', `
-    <div class="ratio-row">
-      <div class="rname">${reg}</div>
-      <div class="ratio-track" data-tip="${reg}：WorkOrder存量 ${woTot.toLocaleString()} / Ticket存量 ${ticketTot.toLocaleString()} = ${ratio.toFixed(1)}%"><div class="ratio-fill ${hot?'hot':''}" style="width:${Math.min(ratio/maxRatio*100,100)}%"></div></div>
-      <div class="ratio-pct num">${ratio.toFixed(1)}%</div>
-    </div>`);
-});
-// ---- Hotline bars (per queue/line) ----
-const hotlineQueues = {
-  "德语区(DE/AT)": [
-    {name:"GER-On-Site", offer:28, answer:22, abandon:6},
-    {name:"GER_End_User", offer:0, answer:0, abandon:0},
-    {name:"GER_Installer", offer:34, answer:33, abandon:1},
-  ],
-  "荷比卢": [
-    {name:"BEL_End_User", offer:4, answer:3, abandon:1},
-    {name:"BEL_Field_Service", offer:35, answer:31, abandon:4},
-    {name:"BEL_Installer", offer:21, answer:20, abandon:1},
-    {name:"NLD_End_User", offer:47, answer:43, abandon:2},
-    {name:"NLD_Field_Service", offer:93, answer:68, abandon:25},
-    {name:"NLD_Installer", offer:89, answer:74, abandon:15},
-  ],
-};
-const hotlineBars = document.getElementById('hotlineBars');
-const allQueues = Object.values(hotlineQueues).flat();
-const maxOffer = Math.max(...allQueues.map(q=>q.offer));
-regions.forEach(reg=>{
-  const queues = hotlineQueues[reg];
-  if(!queues){
-    hotlineBars.insertAdjacentHTML('beforeend', `
-      <div class="region-block">
-        <div class="rlabel"><span>${reg}</span><span class="rtotal num">暂无队列数据</span></div>
-      </div>`);
-    return;
-  }
-  const regionTotal = queues.reduce((s,q)=>s+q.offer,0);
-  const regionAnswer = queues.reduce((s,q)=>s+q.answer,0);
-  const regionAbandon = queues.reduce((s,q)=>s+q.abandon,0);
-  let rows = '';
-  queues.forEach(q=>{
-    const w = q.offer/maxOffer*100;
-    const answerPct = q.answer/q.offer*100;
-    const abandonPct = q.abandon/q.offer*100;
-    rows += `
-      <div class="bar-row">
-        <div class="tier" style="width:130px;">${q.name}</div>
-        <div class="bar-track" data-tip="${q.name}：来电 ${q.offer}，接起 ${q.answer}（${answerPct.toFixed(0)}%），放弃 ${q.abandon}（${abandonPct.toFixed(0)}%）"><div class="bar-fill" style="width:${w}%">
-          <div class="bar-fill na" style="width:${abandonPct}%; float:right; height:100%;"></div>
-        </div></div>
-        <div class="bar-val num" style="width:230px;text-align:left;padding-left:10px;">
-          来电 ${q.offer}　接起率 <b>${answerPct.toFixed(0)}%</b>　放弃率 <b class="${abandonPct>=30?'delta-up':''}">${abandonPct.toFixed(0)}%</b>
-        </div>
-      </div>`;
-  });
-  hotlineBars.insertAdjacentHTML('beforeend', `
-    <div class="region-block">
-      <div class="rlabel"><span>${reg}</span><span class="rtotal num">合计来电 ${regionTotal}　接起率 ${(regionAnswer/regionTotal*100).toFixed(1)}%　放弃率 ${(regionAbandon/regionTotal*100).toFixed(1)}%</span></div>
-      ${rows}
-    </div>`);
-});
-</script>
-</body>
-</html>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1d2330;--mut:#667085;--line:#e4e7ec;--acc:#0e7c66;--neg:#e8683a;--good:#0e7c66;--bad:#d4380d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141a;--card:#181d26;--tx:#e6e9ef;--mut:#98a2b3;--line:#2a313d;--acc:#2bb69a;--neg:#f08a5d;--good:#2bb69a;--bad:#ff7a59}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 -apple-system,"PingFang SC","Segoe UI",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 60px}h1{font-size:22px;margin:0 0 4px}h2{font-size:16px;margin:0 0 12px}h3{font-size:13px;margin:16px 0 6px;color:var(--mut)}
+.sub{color:var(--mut);margin-bottom:16px;font-size:13px}section{margin-bottom:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.rc .rt,.dc .rt{font-weight:600;margin-bottom:8px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.kpis>div{display:flex;flex-direction:column}.kl{color:var(--mut);font-size:12px}.kv{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
+.ks{color:var(--mut);font-size:12px;font-weight:400}.mix{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 6px;font-size:12px;color:var(--mut)}.mix b{color:var(--tx)}.mix i{font-style:normal}
+.foot{font-size:12px;color:var(--mut);border-top:1px solid var(--line);padding-top:6px}.pts{margin:0;padding-left:18px}.pts li{margin:4px 0}
+.d{font-size:11px;margin-left:4px;font-variant-numeric:tabular-nums}.d.g{color:var(--good)}.d.b{color:var(--bad)}.d.n{color:var(--mut)}
+.bars{display:flex;gap:6px;align-items:center;height:140px}.dcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dpos{width:100%;max-width:26px;background:var(--acc);border-radius:2px 2px 0 0;min-height:1px;margin-top:auto}.dneg{width:100%;max-width:26px;background:var(--neg);border-radius:0 0 2px 2px;min-height:1px;margin-bottom:auto}
+.dcol{position:relative}.dlab{font-size:10px;color:var(--mut);position:absolute;bottom:-16px}.dc{padding-bottom:18px}
+.legend{font-size:12px;color:var(--mut);margin-top:6px}.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px;vertical-align:middle}.sw.n{background:var(--acc)}.sw.c{background:var(--neg)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{color:var(--mut);font-weight:500;font-size:12px}th:first-child,td:first-child{text-align:left}tr.tot td{font-weight:600;background:color-mix(in srgb,var(--line) 35%,transparent)}
+small{color:var(--mut);font-size:11px}.mono{font-family:ui-monospace,Menlo,monospace}.note{color:var(--mut);font-size:12px;margin:8px 0 0}
+</style></head><body><div class="wrap">
+<h1>技术服务部周报</h1>
+<div class="sub">周期 2026-11-02 ~ 11-08（自然周，截至 2026-11-06 11:06 德国时间）· 环比对比上周同期 10-26 ~ 10-30 10:06 · 范围：德语区(DE/AT) / 荷比卢 / ROE，已排除 SOD/ALG、AGSS-TSC Public、大储、质量客诉、已转上门单</div>
+<section class="card"><h2>本周要点</h2><ul class="pts"><li>Ticket 存量 <b>3,725</b>（在手 3,052 · 待领取 673，待领取占 18%），对比上周同期 <span class="d g">▼295</span>。</li><li>本周新建 <b>527</b> / 关单 <b>1,003</b>，净增 <b>-476</b>（上周同期 新建 599 / 关单 915）。</li><li>净增最高：<b>德语区(DE/AT)</b>（-121）；净减最多：<b>荷比卢</b>（-213）。</li><li>SLA≤24h 达标率 <b>29%</b>（472/1,604），上周同期 32%；当前等待超过 24h 的案例 <b>3,527</b>（95%），其中超过 7 天 2,977。</li><li>热线（11-02~11-05）来电 <b>285</b>，接听率 <b>72%</b>。</li></ul></section>
+<section><h2>地区总览</h2><div class="grid3">
+<div class="card rc"><div class="rt">德语区(DE/AT)</div><div class="kpis"><div><span class="kl">存量</span><span class="kv">2,365</span><span class="d g">▼36</span></div><div><span class="kl">待领取</span><span class="kv">483</span><span class="ks">20%</span><span class="d n">—</span></div><div><span class="kl">新建</span><span class="kv">293</span><span class="d n">▼59</span></div><div><span class="kl">关单</span><span class="kv">414</span><span class="d b">▼23</span></div></div><div class="mix">
+<span>L1 <b>2,179</b> <i>92%</i></span>
+<span>L2 <b>89</b> <i>4%</i></span>
+<span>L3 <b>64</b> <i>3%</i></span>
+<span>L4 <b>33</b> <i>1%</i></span>
+</div><div class="foot">工单（不计入上面）：上门 136 · 发货 345</div></div>
+<div class="card rc"><div class="rt">荷比卢</div><div class="kpis"><div><span class="kl">存量</span><span class="kv">1,199</span><span class="d g">▼148</span></div><div><span class="kl">待领取</span><span class="kv">151</span><span class="ks">13%</span><span class="d n">—</span></div><div><span class="kl">新建</span><span class="kv">197</span><span class="d n">▼7</span></div><div><span class="kl">关单</span><span class="kv">410</span><span class="d b">▼11</span></div></div><div class="mix">
+<span>L1 <b>975</b> <i>81%</i></span>
+<span>L2 <b>50</b> <i>4%</i></span>
+<span>L3 <b>153</b> <i>13%</i></span>
+<span>L4 <b>21</b> <i>2%</i></span>
+</div><div class="foot">工单（不计入上面）：上门 139 · 发货 86</div></div>
+<div class="card rc"><div class="rt">ROE</div><div class="kpis"><div><span class="kl">存量</span><span class="kv">161</span><span class="d g">▼111</span></div><div><span class="kl">待领取</span><span class="kv">39</span><span class="ks">24%</span><span class="d n">—</span></div><div><span class="kl">新建</span><span class="kv">37</span><span class="d n">▼6</span></div><div><span class="kl">关单</span><span class="kv">179</span><span class="d g">▲122</span></div></div><div class="mix">
+<span>L1 <b>105</b> <i>65%</i></span>
+<span>L2 <b>14</b> <i>9%</i></span>
+<span>L3 <b>39</b> <i>24%</i></span>
+<span>L4 <b>3</b> <i>2%</i></span>
+</div><div class="foot">工单（不计入上面）：上门 17 · 发货 61</div></div>
+</div></section>
+<section class="card"><h2>每日新建 vs 关单</h2><div class="grid3">
+<div class="dc"><div class="rt">德语区(DE/AT) <span class="ks">新建 293 / 关单 414 · 累计净增 -121</span></div><div class="bars"><div class="dcol"><div class="dpos" style="height:24px" title="新建 59"></div><div class="dneg" style="height:27px" title="关单 68"></div><div class="dlab">11-02</div></div><div class="dcol"><div class="dpos" style="height:28px" title="新建 69"></div><div class="dneg" style="height:33px" title="关单 82"></div><div class="dlab">11-03</div></div><div class="dcol"><div class="dpos" style="height:30px" title="新建 75"></div><div class="dneg" style="height:56px" title="关单 140"></div><div class="dlab">11-04</div></div><div class="dcol"><div class="dpos" style="height:29px" title="新建 73"></div><div class="dneg" style="height:35px" title="关单 87"></div><div class="dlab">11-05</div></div><div class="dcol"><div class="dpos" style="height:7px" title="新建 17"></div><div class="dneg" style="height:15px" title="关单 37"></div><div class="dlab">11-06</div></div></div></div>
+<div class="dc"><div class="rt">荷比卢 <span class="ks">新建 197 / 关单 410 · 累计净增 -213</span></div><div class="bars"><div class="dcol"><div class="dpos" style="height:21px" title="新建 43"></div><div class="dneg" style="height:40px" title="关单 84"></div><div class="dlab">11-02</div></div><div class="dcol"><div class="dpos" style="height:19px" title="新建 39"></div><div class="dneg" style="height:56px" title="关单 117"></div><div class="dlab">11-03</div></div><div class="dcol"><div class="dpos" style="height:24px" title="新建 51"></div><div class="dneg" style="height:47px" title="关单 99"></div><div class="dlab">11-04</div></div><div class="dcol"><div class="dpos" style="height:23px" title="新建 48"></div><div class="dneg" style="height:34px" title="关单 71"></div><div class="dlab">11-05</div></div><div class="dcol"><div class="dpos" style="height:8px" title="新建 16"></div><div class="dneg" style="height:19px" title="关单 39"></div><div class="dlab">11-06</div></div></div></div>
+<div class="dc"><div class="rt">ROE <span class="ks">新建 37 / 关单 179 · 累计净增 -142</span></div><div class="bars"><div class="dcol"><div class="dpos" style="height:9px" title="新建 11"></div><div class="dneg" style="height:23px" title="关单 27"></div><div class="dlab">11-02</div></div><div class="dcol"><div class="dpos" style="height:6px" title="新建 7"></div><div class="dneg" style="height:47px" title="关单 55"></div><div class="dlab">11-03</div></div><div class="dcol"><div class="dpos" style="height:6px" title="新建 7"></div><div class="dneg" style="height:56px" title="关单 65"></div><div class="dlab">11-04</div></div><div class="dcol"><div class="dpos" style="height:8px" title="新建 9"></div><div class="dneg" style="height:14px" title="关单 16"></div><div class="dlab">11-05</div></div><div class="dcol"><div class="dpos" style="height:3px" title="新建 3"></div><div class="dneg" style="height:14px" title="关单 16"></div><div class="dlab">11-06</div></div></div></div>
+</div><div class="legend"><span class="sw n"></span>新建 <span class="sw c"></span>关单</div></section>
+<section class="card"><h2>案例池（L1–L4）</h2>
+<h3>德语区(DE/AT)</h3><div class="tw"><table><tr><th>层级</th><th>在手</th><th>待领取</th><th>新建</th><th>新建已领</th><th>关单</th><th>SLA≤24h</th><th>等待&gt;24h</th></tr>
+<tr><td>L1</td><td>1,734</td><td>445 <small>20%</small> <span class="d n">—</span></td><td>268 <span class="d n">▼50</span></td><td>257 <small>96%</small></td><td>376 <span class="d b">▼22</span></td><td><b>22%</b> <small>123/554</small> <span class="d b">▼8pt</span></td><td>2,099 <small>96%</small> <span class="d n">—</span> <small>其中&gt;7天 1,815</small></td></tr>
+<tr><td>L2</td><td>88</td><td>1 <small>1%</small> <span class="d n">—</span></td><td>3 <span class="d n">▼6</span></td><td>3 <small>100%</small></td><td>7 <span class="d b">▼19</span></td><td><b>13%</b> <small>2/15</small> <span class="d g">▲6pt</span></td><td>83 <small>93%</small> <span class="d n">—</span> <small>其中&gt;7天 70</small></td></tr>
+<tr><td>L3</td><td>27</td><td>37 <small>58%</small> <span class="d n">—</span></td><td>10 <span class="d n">▼10</span></td><td>6 <small>60%</small></td><td>29 <span class="d g">▲22</span></td><td><b>39%</b> <small>7/18</small> <span class="d g">▲39pt</span></td><td>50 <small>78%</small> <span class="d n">—</span> <small>其中&gt;7天 27</small></td></tr>
+<tr><td>L4</td><td>33</td><td>0 <small>0%</small> <span class="d n">—</span></td><td>12 <span class="d n">▲7</span></td><td>12 <small>100%</small></td><td>2 <span class="d b">▼4</span></td><td><b>79%</b> <small>140/178</small> <span class="d g">▲10pt</span></td><td>19 <small>58%</small> <span class="d n">—</span> <small>其中&gt;7天 16</small></td></tr>
+<tr class="tot"><td>L1–L4 合计</td><td>1,882</td><td>483 <small>20%</small> <span class="d n">—</span></td><td>293 <span class="d n">▼59</span></td><td>278 <small>95%</small></td><td>414 <span class="d b">▼23</span></td><td><b>36%</b> <small>272/765</small> <span class="d b">▼1pt</span></td><td>2,251 <small>95%</small> <span class="d n">—</span> <small>其中&gt;7天 1,928</small></td></tr>
+</table></div>
+<h3>荷比卢</h3><div class="tw"><table><tr><th>层级</th><th>在手</th><th>待领取</th><th>新建</th><th>新建已领</th><th>关单</th><th>SLA≤24h</th><th>等待&gt;24h</th></tr>
+<tr><td>L1</td><td>884</td><td>91 <small>9%</small> <span class="d n">—</span></td><td>180 <span class="d n">▼3</span></td><td>160 <small>89%</small></td><td>358 <span class="d b">▼35</span></td><td><b>18%</b> <small>85/472</small> <span class="d b">▼2pt</span></td><td>929 <small>95%</small> <span class="d n">—</span> <small>其中&gt;7天 775</small></td></tr>
+<tr><td>L2</td><td>50</td><td>0 <small>0%</small> <span class="d n">—</span></td><td>0 <span class="d n">▼1</span></td><td>0 <small>—</small></td><td>26 <span class="d g">▲13</span></td><td><b>7%</b> <small>2/30</small> <span class="d g">▲7pt</span></td><td>50 <small>100%</small> <span class="d n">—</span> <small>其中&gt;7天 45</small></td></tr>
+<tr><td>L3</td><td>93</td><td>60 <small>39%</small> <span class="d n">—</span></td><td>7 <span class="d n">▼13</span></td><td>0 <small>0%</small></td><td>25 <span class="d g">▲11</span></td><td><b>0%</b> <small>0/6</small> <span class="d b">▼67pt</span></td><td>150 <small>98%</small> <span class="d n">—</span> <small>其中&gt;7天 121</small></td></tr>
+<tr><td>L4</td><td>21</td><td>0 <small>0%</small> <span class="d n">—</span></td><td>10 <span class="d n">▲10</span></td><td>10 <small>100%</small></td><td>1 <span class="d n">±0</span></td><td><b>70%</b> <small>62/89</small> <span class="d b">▼6pt</span></td><td>5 <small>24%</small> <span class="d n">—</span> <small>其中&gt;7天 3</small></td></tr>
+<tr class="tot"><td>L1–L4 合计</td><td>1,048</td><td>151 <small>13%</small> <span class="d n">—</span></td><td>197 <span class="d n">▼7</span></td><td>170 <small>86%</small></td><td>410 <span class="d b">▼11</span></td><td><b>25%</b> <small>149/597</small> <span class="d b">▼1pt</span></td><td>1,134 <small>95%</small> <span class="d n">—</span> <small>其中&gt;7天 944</small></td></tr>
+</table></div>
+<h3>ROE</h3><div class="tw"><table><tr><th>层级</th><th>在手</th><th>待领取</th><th>新建</th><th>新建已领</th><th>关单</th><th>SLA≤24h</th><th>等待&gt;24h</th></tr>
+<tr><td>L1</td><td>101</td><td>4 <small>4%</small> <span class="d n">—</span></td><td>27 <span class="d n">▼8</span></td><td>24 <small>89%</small></td><td>165 <span class="d g">▲112</span></td><td><b>14%</b> <small>30/210</small> <span class="d b">▼10pt</span></td><td>97 <small>92%</small> <span class="d n">—</span> <small>其中&gt;7天 75</small></td></tr>
+<tr><td>L2</td><td>12</td><td>2 <small>14%</small> <span class="d n">—</span></td><td>0 <span class="d n">±0</span></td><td>0 <small>—</small></td><td>5 <span class="d g">▲5</span></td><td><b>0%</b> <small>0/1</small> <span class="d n">±0</span></td><td>13 <small>93%</small> <span class="d n">—</span> <small>其中&gt;7天 13</small></td></tr>
+<tr><td>L3</td><td>6</td><td>33 <small>85%</small> <span class="d n">—</span></td><td>7 <span class="d n">▼1</span></td><td>0 <small>0%</small></td><td>9 <span class="d g">▲6</span></td><td><b>0%</b> <small>0/1</small> <span class="d b">▼100pt</span></td><td>32 <small>82%</small> <span class="d n">—</span> <small>其中&gt;7天 17</small></td></tr>
+<tr><td>L4</td><td>3</td><td>0 <small>0%</small> <span class="d n">—</span></td><td>3 <span class="d n">▲3</span></td><td>3 <small>100%</small></td><td>0 <span class="d b">▼1</span></td><td><b>70%</b> <small>21/30</small> <span class="d g">▲9pt</span></td><td>0 <small>0%</small> <span class="d n">—</span> <small>其中&gt;7天 0</small></td></tr>
+<tr class="tot"><td>L1–L4 合计</td><td>122</td><td>39 <small>24%</small> <span class="d n">—</span></td><td>37 <span class="d n">▼6</span></td><td>27 <small>73%</small></td><td>179 <span class="d g">▲122</span></td><td><b>21%</b> <small>51/242</small> <span class="d b">▼13pt</span></td><td>142 <small>88%</small> <span class="d n">—</span> <small>其中&gt;7天 105</small></td></tr>
+</table></div>
+<h3>全欧合计</h3><div class="tw"><table><tr><th>层级</th><th>在手</th><th>待领取</th><th>新建</th><th>新建已领</th><th>关单</th><th>SLA≤24h</th><th>等待&gt;24h</th></tr>
+<tr><td>L1</td><td>2,719</td><td>540 <small>17%</small> <span class="d n">—</span></td><td>475 <span class="d n">▼61</span></td><td>441 <small>93%</small></td><td>899 <span class="d g">▲55</span></td><td><b>19%</b> <small>238/1,236</small> <span class="d b">▼6pt</span></td><td>3,125 <small>96%</small> <span class="d n">—</span> <small>其中&gt;7天 2,665</small></td></tr>
+<tr><td>L2</td><td>150</td><td>3 <small>2%</small> <span class="d n">—</span></td><td>3 <span class="d n">▼7</span></td><td>3 <small>100%</small></td><td>38 <span class="d b">▼1</span></td><td><b>9%</b> <small>4/46</small> <span class="d g">▲5pt</span></td><td>146 <small>95%</small> <span class="d n">—</span> <small>其中&gt;7天 128</small></td></tr>
+<tr><td>L3</td><td>126</td><td>130 <small>51%</small> <span class="d n">—</span></td><td>24 <span class="d n">▼24</span></td><td>6 <small>25%</small></td><td>63 <span class="d g">▲39</span></td><td><b>28%</b> <small>7/25</small> <span class="d g">▲3pt</span></td><td>232 <small>91%</small> <span class="d n">—</span> <small>其中&gt;7天 165</small></td></tr>
+<tr><td>L4</td><td>57</td><td>0 <small>0%</small> <span class="d n">—</span></td><td>25 <span class="d n">▲20</span></td><td>25 <small>100%</small></td><td>3 <span class="d b">▼5</span></td><td><b>75%</b> <small>223/297</small> <span class="d g">▲5pt</span></td><td>24 <small>42%</small> <span class="d n">—</span> <small>其中&gt;7天 19</small></td></tr>
+<tr class="tot"><td>L1–L4 合计</td><td>3,052</td><td>673 <small>18%</small> <span class="d n">—</span></td><td>527 <span class="d n">▼72</span></td><td>475 <small>90%</small></td><td>1,003 <span class="d g">▲88</span></td><td><b>29%</b> <small>472/1,604</small> <span class="d b">▼3pt</span></td><td>3,527 <small>95%</small> <span class="d n">—</span> <small>其中&gt;7天 2,977</small></td></tr>
+</table></div>
+<p class="note">存量 = 在手 + 待领取（待领取、等待&gt;24h 的环比对比上周五快照）；新建已领 = 本周新建里已被个人领取/处理的比例；SLA 与等待时长不含已转上门单。</p></section>
+<section class="card"><h2>账龄与处理时长</h2><div class="tw"><table><tr><th>地区</th><th>≤24h</th><th>1–7 天</th><th>&gt;7 天</th><th>未转上门单客诉平均处理时长</th><th>中位</th><th>关单数</th></tr>
+<tr><td>德语区(DE/AT)</td><td>114</td><td>323</td><td>1,928 <small>82%</small></td><td>79.0 天 <span class="d b">▲36.4天</span></td><td>28.1 天</td><td>356</td></tr>
+<tr><td>荷比卢</td><td>65</td><td>190</td><td>944 <small>79%</small></td><td>26.9 天 <span class="d b">▲5.8天</span></td><td>19.0 天</td><td>387</td></tr>
+<tr><td>ROE</td><td>19</td><td>37</td><td>105 <small>65%</small></td><td>103.0 天 <span class="d b">▲72.7天</span></td><td>27.0 天</td><td>159</td></tr>
+<tr><td>全欧合计</td><td>198</td><td>550</td><td>2,977 <small>80%</small></td><td>60.9 天 <span class="d b">▲28.8天</span></td><td>20.6 天</td><td>902</td></tr>
+</table></div><p class="note">账龄 = 案例在当前层级已停留的时间（未关闭的案例池，在手+待领取）；处理时长 = 本周关单案例的建单到关单。</p></section>
+<section class="card"><h2>层级流转（本周）</h2><div class="tw"><table><tr><th>地区</th><th>转 L2</th><th>转 L3</th><th>转 L4</th><th>转回 L1</th></tr>
+<tr><td>德语区(DE/AT)</td><td>24 <span class="d n">▼7</span></td><td>73 <span class="d n">▼9</span></td><td>162 <span class="d n">▲16</span></td><td>190 <span class="d n">▲34</span></td></tr>
+<tr><td>荷比卢</td><td>8 <span class="d n">▲4</span></td><td>34 <span class="d n">▲3</span></td><td>85 <span class="d n">▲15</span></td><td>89 <span class="d n">▲22</span></td></tr>
+<tr><td>ROE</td><td>1 <span class="d n">±0</span></td><td>23 <span class="d n">▲8</span></td><td>29 <span class="d n">▲7</span></td><td>30 <span class="d n">▲3</span></td></tr>
+<tr><td>全欧合计</td><td>33 <span class="d n">▼3</span></td><td>130 <span class="d n">▲2</span></td><td>276 <span class="d n">▲38</span></td><td>309 <span class="d n">▲59</span></td></tr>
+</table></div><p class="note">按案例实际流转次数统计（不区分谁操作）：转回 L1 = 从 L2/L3/L4 退回 L1，其中大部分是 L4 处理后退回。</p></section>
+<section class="card"><h2>Work Order</h2><div class="tw"><table><tr><th>地区</th><th>类型</th><th>在手</th><th>新建</th><th>关单</th></tr>
+<tr><td>德语区(DE/AT)</td><td>发货</td><td>345</td><td>37 <span class="d n">▲22</span></td><td>8 <span class="d g">▲1</span></td></tr>
+<tr><td>德语区(DE/AT)</td><td>内部上门</td><td>51</td><td>4 <span class="d n">▼6</span></td><td>8 <span class="d b">▼1</span></td></tr>
+<tr><td>德语区(DE/AT)</td><td>服务商上门</td><td>85</td><td>12 <span class="d n">▲4</span></td><td>20 <span class="d g">▲19</span></td></tr>
+<tr><td>荷比卢</td><td>发货</td><td>86</td><td>6 <span class="d n">▲5</span></td><td>3 <span class="d g">▲1</span></td></tr>
+<tr><td>荷比卢</td><td>内部上门</td><td>93</td><td>30 <span class="d n">▲16</span></td><td>12 <span class="d n">±0</span></td></tr>
+<tr><td>荷比卢</td><td>服务商上门</td><td>46</td><td>10 <span class="d n">▲4</span></td><td>4 <span class="d b">▼2</span></td></tr>
+<tr><td>ROE</td><td>发货</td><td>61</td><td>3 <span class="d n">±0</span></td><td>0 <span class="d b">▼4</span></td></tr>
+<tr><td>ROE</td><td>内部上门</td><td>17</td><td>4 <span class="d n">▲2</span></td><td>4 <span class="d g">▲3</span></td></tr>
+<tr><td>ROE</td><td>服务商上门</td><td>0</td><td>0 <span class="d n">±0</span></td><td>0 <span class="d n">±0</span></td></tr>
+</table></div>
+<h3>发货工单状态 · 工单/Ticket 存量比</h3><div class="tw"><table><tr><th>地区</th><th>发货工单状态分布</th><th>WO 存量</th><th>Ticket 存量</th><th>比值</th></tr>
+<tr><td>德语区(DE/AT)</td><td>发货已提交 338 · 未知 5 · 待发货 2</td><td>481</td><td>2,365</td><td>0.20</td></tr>
+<tr><td>荷比卢</td><td>发货已提交 84 · 待发货 1 · 未知 1</td><td>225</td><td>1,199</td><td>0.19</td></tr>
+<tr><td>ROE</td><td>发货已提交 59 · 待发货 1 · 未知 1</td><td>78</td><td>161</td><td>0.48</td></tr>
+</table></div></section>
+<section class="card"><h2>Hotline（分队列 · 本周累计）</h2>
+<p class="note">数据覆盖 11-02 11-03 11-04 11-05（当天 18:30 之后才有当日数据）。ASA/平均等待/AHT/ACW 为 mm:ss，按接听数或来电数加权。</p>
+<div class="tw"><table><tr><th>队列</th><th>来电</th><th>接听</th><th>放弃</th><th>接听率</th><th>ASA</th><th>平均等待</th><th>AHT</th><th>ACW</th><th>服务水平</th></tr>
+<tr class="tot"><td>德语区(DE/AT) 合计</td><td>53</td><td>51</td><td>2</td><td>96%</td><td colspan="5"></td></tr>
+<tr><td>&nbsp;&nbsp;GER_Installer</td><td>33</td><td>31</td><td>2</td><td>94%</td><td>0:50</td><td>0:50</td><td>9:32</td><td>2:22</td><td>45%</td></tr>
+<tr><td>&nbsp;&nbsp;GER-On-Site</td><td>20</td><td>20</td><td>0</td><td>100%</td><td>0:56</td><td>0:56</td><td>18:59</td><td>1:27</td><td>65%</td></tr>
+<tr class="tot"><td>荷比卢 合计</td><td>232</td><td>155</td><td>58</td><td>67%</td><td colspan="5"></td></tr>
+<tr><td>&nbsp;&nbsp;NLD_Field_Service</td><td>83</td><td>63</td><td>20</td><td>76%</td><td>7:19</td><td>8:30</td><td>10:51</td><td>3:37</td><td>12%</td></tr>
+<tr><td>&nbsp;&nbsp;NLD_Installer</td><td>75</td><td>60</td><td>15</td><td>80%</td><td>4:23</td><td>5:22</td><td>15:35</td><td>5:02</td><td>40%</td></tr>
+<tr><td>&nbsp;&nbsp;NLD_End_User</td><td>54</td><td>20</td><td>15</td><td>37%</td><td>0:12</td><td>0:53</td><td>18:22</td><td>5:59</td><td>48%</td></tr>
+<tr><td>&nbsp;&nbsp;BEL_Field_Service</td><td>11</td><td>7</td><td>4</td><td>64%</td><td>4:33</td><td>6:43</td><td>11:03</td><td>3:22</td><td>0%</td></tr>
+<tr><td>&nbsp;&nbsp;BEL_Installer</td><td>8</td><td>4</td><td>4</td><td>50%</td><td>3:49</td><td>10:54</td><td>19:20</td><td>5:20</td><td>38%</td></tr>
+<tr><td>&nbsp;&nbsp;BEL_End_User</td><td>1</td><td>1</td><td>0</td><td>100%</td><td>0:08</td><td>0:08</td><td>28:15</td><td>7:39</td><td>100%</td></tr>
+</table></div>
+</section>
+<section class="card"><h2>重点安装商案例池</h2><p class="note">上月（2026-10）装机前十（按 LICENSE），L1–L4 合计；排名口径同装机周报（剔除 ALG/ZVG）。</p>
+<h3>德语区(DE/AT) 装机前十（德国+奥地利）</h3><div class="tw"><table><tr><th>#</th><th>安装商</th><th>上月装机</th><th>在手</th><th>待领取</th><th>新建</th><th>新建已领</th><th>关单</th><th>SLA≤24h</th><th>等待&gt;24h</th></tr>
+<tr><td>1</td><td>IEE<br><small class="mono">ALPHA202407290015</small></td><td>191</td><td>50</td><td>2</td><td>12</td><td>12 <small>100%</small></td><td>28</td><td>16% <small>5/32</small></td><td>45 <small>87%</small></td></tr>
+<tr><td>2</td><td>ken.orzeck@futures-solar.de<br><small class="mono">ALPHA202404290010</small></td><td>88</td><td>12</td><td>0</td><td>1</td><td>1 <small>100%</small></td><td>6</td><td>42% <small>5/12</small></td><td>12 <small>100%</small></td></tr>
+<tr><td>3</td><td>sjannik1999@gmail.com<br><small class="mono">ALPHA202308290004</small></td><td>70</td><td>31</td><td>1</td><td>7</td><td>7 <small>100%</small></td><td>11</td><td>41% <small>7/17</small></td><td>31 <small>97%</small></td></tr>
+<tr><td>4</td><td>SonnenVision GmbH<br><small class="mono">ALPHA202410230003</small></td><td>46</td><td>22</td><td>0</td><td>1</td><td>1 <small>100%</small></td><td>9</td><td>12% <small>2/16</small></td><td>21 <small>95%</small></td></tr>
+<tr><td>5</td><td>info@em-et.de<br><small class="mono">ALPHA202606180008</small></td><td>46</td><td>8</td><td>1</td><td>1</td><td>1 <small>100%</small></td><td>0</td><td>— <small>0/0</small></td><td>9 <small>100%</small></td></tr>
+<tr><td>6</td><td>BTPV<br><small class="mono">ALPHA202207150004</small></td><td>40</td><td>29</td><td>0</td><td>3</td><td>3 <small>100%</small></td><td>13</td><td>0% <small>0/14</small></td><td>27 <small>93%</small></td></tr>
+<tr><td>7</td><td>Nordwestgruppe<br><small class="mono">ALPHA1437136910</small></td><td>32</td><td>49</td><td>1</td><td>4</td><td>4 <small>100%</small></td><td>13</td><td>30% <small>7/23</small></td><td>47 <small>94%</small></td></tr>
+<tr><td>8</td><td>SolarConsult<br><small class="mono">ALPHA0274157107</small></td><td>26</td><td>29</td><td>3</td><td>6</td><td>6 <small>100%</small></td><td>9</td><td>38% <small>8/21</small></td><td>30 <small>94%</small></td></tr>
+<tr><td>9</td><td>Albert<br><small class="mono">ALPHA0377239651</small></td><td>24</td><td>24</td><td>4</td><td>3</td><td>3 <small>100%</small></td><td>2</td><td>33% <small>1/3</small></td><td>27 <small>96%</small></td></tr>
+<tr><td>10</td><td>elektro-gaertner<br><small class="mono">ALPHA4063167601</small></td><td>24</td><td>15</td><td>3</td><td>3</td><td>3 <small>100%</small></td><td>1</td><td>25% <small>1/4</small></td><td>18 <small>100%</small></td></tr>
+</table></div>
+<h3>荷比卢装机前十（荷兰+比利时+卢森堡）</h3><div class="tw"><table><tr><th>#</th><th>安装商</th><th>上月装机</th><th>在手</th><th>待领取</th><th>新建</th><th>新建已领</th><th>关单</th><th>SLA≤24h</th><th>等待&gt;24h</th></tr>
+<tr><td>1</td><td>Solarite B.V.<br><small class="mono">ALPHA202411130004</small></td><td>381</td><td>63</td><td>7</td><td>16</td><td>16 <small>100%</small></td><td>25</td><td>27% <small>11/41</small></td><td>66 <small>94%</small></td></tr>
+<tr><td>2</td><td>Solarconcept<br><small class="mono">ALPHA202401090003</small></td><td>155</td><td>48</td><td>10</td><td>8</td><td>5 <small>62%</small></td><td>16</td><td>27% <small>7/26</small></td><td>56 <small>97%</small></td></tr>
+<tr><td>3</td><td>info@insaver.be<br><small class="mono">ALPHA202411070004</small></td><td>109</td><td>31</td><td>2</td><td>7</td><td>7 <small>100%</small></td><td>15</td><td>16% <small>4/25</small></td><td>30 <small>91%</small></td></tr>
+<tr><td>4</td><td>jeroen.borremans@energyking.be<br><small class="mono">ALPHA202411290003</small></td><td>96</td><td>69</td><td>12</td><td>1</td><td>1 <small>100%</small></td><td>33</td><td>8% <small>3/38</small></td><td>81 <small>100%</small></td></tr>
+<tr><td>5</td><td>terence@lumex.nl<br><small class="mono">ALPHA202502170006</small></td><td>79</td><td>28</td><td>6</td><td>14</td><td>9 <small>64%</small></td><td>19</td><td>26% <small>6/23</small></td><td>27 <small>79%</small></td></tr>
+<tr><td>6</td><td>it@solarcentrumnederland.nl<br><small class="mono">ALPHA202501280003</small></td><td>73</td><td>18</td><td>1</td><td>5</td><td>5 <small>100%</small></td><td>9</td><td>36% <small>4/11</small></td><td>17 <small>89%</small></td></tr>
+<tr><td>7</td><td>cocor204@gmail.com<br><small class="mono">ALPHA202507310010</small></td><td>65</td><td>20</td><td>1</td><td>2</td><td>2 <small>100%</small></td><td>5</td><td>30% <small>3/10</small></td><td>19 <small>90%</small></td></tr>
+<tr><td>8</td><td>Quatt<br><small class="mono">ALPHA202502180004</small></td><td>53</td><td>6</td><td>1</td><td>1</td><td>1 <small>100%</small></td><td>0</td><td>— <small>0/0</small></td><td>7 <small>100%</small></td></tr>
+<tr><td>9</td><td>weallthesame12@gmail.com<br><small class="mono">ALPHA20260813498331</small></td><td>51</td><td>2</td><td>0</td><td>0</td><td>0 <small>—</small></td><td>2</td><td>25% <small>1/4</small></td><td>2 <small>100%</small></td></tr>
+<tr><td>10</td><td>info@thuisbatterijnederland.nl<br><small class="mono">ALPHA202408230001</small></td><td>48</td><td>23</td><td>3</td><td>3</td><td>3 <small>100%</small></td><td>9</td><td>0% <small>0/10</small></td><td>26 <small>100%</small></td></tr>
+</table></div>
+</section>
+</div></body></html>
